@@ -1,0 +1,17 @@
+Goal : Factor
+     ;
+
+Factor : name ArgList
+       | number
+       | ( Expr )
+       ;
+
+ArgList : LP ExprList RP
+	| LB ExprList RB
+	| epsilon
+	;
+
+ExprList : Expr ExprList
+	 | epsilon
+	 ;
+

@@ -1,0 +1,9 @@
+BParens : List
+        ;
+
+List : Pair List
+     | epsilon
+     ;
+
+Pair : LParen List RParen
+     ;
