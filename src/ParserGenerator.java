@@ -12,7 +12,7 @@ public class ParserGenerator {
 		this.inputGrammarPath=inputGrammarPath;
 	}
 	
-	public void run() throws InvalidCommandLineArgumentException
+	public void run() throws InvalidCommandLineArgumentException, IllegalCharacterException
 	{
 		BufferedReader bufferedFileReader = openFile(inputGrammarPath);
 		Scanner scanner = new Scanner();
@@ -24,7 +24,7 @@ public class ParserGenerator {
 	{
 		for (int i=0; i<toBePrinted.size(); i++)
 		{
-			System.out.println(toBePrinted);
+			System.out.println(toBePrinted.get(i));
 		}
 	}
 	
@@ -67,7 +67,7 @@ public class ParserGenerator {
 		return null;
 	}
 
-	public static void main (String [] args) throws InvalidCommandLineArgumentException
+	public static void main (String [] args) throws InvalidCommandLineArgumentException, IllegalCharacterException
 	{
 		if(args.length==0)
 		{

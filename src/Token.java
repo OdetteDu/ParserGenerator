@@ -5,11 +5,35 @@ public class Token {
 	
 	private Type type;
 	private String value;
-
-	public Token(Type type, String value)
+	
+	private Token(Type type, String value)
 	{
 		this.type = type;
 		this.value = value;
+	}
+	
+	public static Token getToken(Type type)
+	{
+		if(type != Type.SYMBOL)
+		{
+			return new Token(type, null);
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	public static Token getToken(Type type, String value)
+	{
+		if(type == Type.SYMBOL)
+		{
+			return new Token(type, value);
+		}
+		else
+		{
+			return null;
+		}
 	}
 	
 	public String toString()
