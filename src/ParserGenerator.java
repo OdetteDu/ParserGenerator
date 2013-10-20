@@ -16,8 +16,10 @@ public class ParserGenerator {
 	{
 		BufferedReader bufferedFileReader = openFile(inputGrammarPath);
 		Scanner scanner = new Scanner();
-		ArrayList<Token> tokens=scanner.scan(bufferedFileReader);
+		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
+		print(productionSets);
 		Parser parser = new Parser();
+		parser.parse(productionSets);
 	}
 	
 	@SuppressWarnings("rawtypes")

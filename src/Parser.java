@@ -2,16 +2,22 @@ import java.util.ArrayList;
 
 public class Parser {
 	
-	private ArrayList<Token> tokens;
-	
 	public Parser()
 	{
 		
 	}
 	
-	public void parse(ArrayList<Token> tokens)
+	public void parse(ArrayList<ProductionSet> productionSets)
 	{
-		this.tokens = tokens;
+		for (int i=0; i<productionSets.size(); i++)
+		{
+			parseProductionSet(productionSets.get(i));
+		}
+	}
+	
+	private void parseProductionSet(ProductionSet productionSet)
+	{
+		
 	}
 
 }

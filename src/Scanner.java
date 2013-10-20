@@ -5,14 +5,16 @@ import java.util.ArrayList;
 
 public class Scanner {
 	
-	private ArrayList<Token> tokens;
+	private ArrayList<ProductionSet> productionSets;
+	ArrayList<Token> currentProductionSet;
 	
 	public Scanner()
 	{
-		 tokens = new ArrayList<Token>();
+		 productionSets = new ArrayList<ProductionSet>();
+		 currentProductionSet = new ArrayList<Token>();
 	}
 	
-	public ArrayList<Token> scan(BufferedReader reader) throws InvalidCommandLineArgumentException, IllegalCharacterException
+	public ArrayList<ProductionSet> scan(BufferedReader reader) throws InvalidCommandLineArgumentException, IllegalCharacterException
 	{
 		try 
 		{
@@ -28,7 +30,7 @@ public class Scanner {
 			throw new InvalidCommandLineArgumentException("The file is unavailable to open correctly. ");
 		}
 		
-		return tokens;
+		return productionSets;
 	}
 	
 	private void scanLine(String currentLine) throws IllegalCharacterException
@@ -43,7 +45,7 @@ public class Scanner {
 				Token token = stringToToken(temp);
 				if(token != null)
 				{
-					tokens.add(token);
+					currentProductionSet.add(token);
 				}
 				temp = "";
 			}
@@ -52,30 +54,32 @@ public class Scanner {
 				Token token = stringToToken(temp);
 				if(token != null)
 				{
-					tokens.add(token);
+					currentProductionSet.add(token);
 				}
 				temp = "";
-				tokens.add(Token.getToken(Token.Type.SEMICOLON));
+				currentProductionSet.add(Token.getToken(Token.Type.SEMICOLON));
+				productionSets.add(new ProductionSet(currentProductionSet));
+				currentProductionSet = new ArrayList<Token>();
 			}
 			else if(c==':')
 			{
 				Token token = stringToToken(temp);
 				if(token != null)
 				{
-					tokens.add(token);
+					currentProductionSet.add(token);
 				}
 				temp = "";
-				tokens.add(Token.getToken(Token.Type.DERIVES));
+				currentProductionSet.add(Token.getToken(Token.Type.DERIVES));
 			}
 			else if(c=='|')
 			{
 				Token token = stringToToken(temp);
 				if(token != null)
 				{
-					tokens.add(token);
+					currentProductionSet.add(token);
 				}
 				temp = "";
-				tokens.add(Token.getToken(Token.Type.ALSODERIVES));
+				currentProductionSet.add(Token.getToken(Token.Type.ALSODERIVES));
 			}
 			else
 			{
@@ -86,7 +90,7 @@ public class Scanner {
 		Token token = stringToToken(temp);
 		if(token != null)
 		{
-			tokens.add(token);
+			currentProductionSet.add(token);
 		}
 	}
 	
