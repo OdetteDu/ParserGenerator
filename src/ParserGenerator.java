@@ -17,10 +17,11 @@ public class ParserGenerator {
 		BufferedReader bufferedFileReader = openFile(inputGrammarPath);
 		Scanner scanner = new Scanner();
 		ArrayList<Token> tokens=scanner.scan(bufferedFileReader);
-		print(tokens);
+		Parser parser = new Parser();
 	}
 	
-	private void print(ArrayList<Token> toBePrinted)
+	@SuppressWarnings("rawtypes")
+	private void print(ArrayList toBePrinted)
 	{
 		for (int i=0; i<toBePrinted.size(); i++)
 		{

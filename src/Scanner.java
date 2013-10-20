@@ -49,14 +49,32 @@ public class Scanner {
 			}
 			else if(c==';')
 			{
+				Token token = stringToToken(temp);
+				if(token != null)
+				{
+					tokens.add(token);
+				}
+				temp = "";
 				tokens.add(Token.getToken(Token.Type.SEMICOLON));
 			}
 			else if(c==':')
 			{
+				Token token = stringToToken(temp);
+				if(token != null)
+				{
+					tokens.add(token);
+				}
+				temp = "";
 				tokens.add(Token.getToken(Token.Type.DERIVES));
 			}
 			else if(c=='|')
 			{
+				Token token = stringToToken(temp);
+				if(token != null)
+				{
+					tokens.add(token);
+				}
+				temp = "";
 				tokens.add(Token.getToken(Token.Type.ALSODERIVES));
 			}
 			else
