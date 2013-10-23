@@ -3,6 +3,9 @@ import java.util.HashMap;
 
 public class Parser {
 	
+	public static Symbol EOF = new Symbol(Symbol.Type.TERMINAL, "EOF");
+	public static Symbol EPSILON = new Symbol(Symbol.Type.TERMINAL, "EPSILON");
+	
 	private HashMap<String, Symbol> nonTerminalSymbols;
 	private HashMap<String, Symbol> terminalSymbols;
 	
@@ -10,16 +13,27 @@ public class Parser {
 	{
 		nonTerminalSymbols = new HashMap<String, Symbol>();
 		terminalSymbols = new HashMap<String, Symbol>();
+		terminalSymbols.put(EOF.getValue(), EOF);
 	}
 	
 	public ArrayList<Production> parse(ArrayList<ProductionSet> productionSets) throws ParseException
 	{
 		ArrayList<Production> productions = new ArrayList<Production>();
 		
+		//parse production set
 		for (int i=0; i<productionSets.size(); i++)
 		{
 			productions.addAll(parseProductionSet(productionSets.get(i)));
 		}
+		
+		//sets symbol type
+		for (int i=0; i<productions.size(); i++)
+		{
+			terminalSymbols.putAll(productions.get(i).assignSymbolType(nonTerminalSymbols));
+		}
+		
+		Printer.print(nonTerminalSymbols);
+		Printer.print(terminalSymbols);
 		
 		return productions;
 	}
@@ -98,7 +112,7 @@ public class Parser {
 			else
 			{
 				ArrayList<Symbol> symbols = new ArrayList<Symbol>();
-				symbols.add(new Symbol(Symbol.Type.TERMINAL, "EPSILON"));
+				symbols.add(EPSILON);
 				return new Production(leftHandSide, symbols);
 			}
 		}

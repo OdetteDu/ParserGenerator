@@ -19,17 +19,10 @@ public class ParserGenerator {
 		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
 		Parser parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
-		print(productions);
+		Printer.print(productions);
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private void print(ArrayList toBePrinted)
-	{
-		for (int i=0; i<toBePrinted.size(); i++)
-		{
-			System.out.println(toBePrinted.get(i));
-		}
-	}
+	
 	
 	private BufferedReader openFile(String filePath) throws InvalidCommandLineArgumentException
 	{

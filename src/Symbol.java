@@ -30,5 +30,10 @@ public class Symbol {
 	{
 		return value;
 	}
+	
+	public String toString()
+	{
+		return "("+type+","+value+")";
+	}
 
 }
