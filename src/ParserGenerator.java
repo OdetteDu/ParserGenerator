@@ -20,6 +20,9 @@ public class ParserGenerator {
 		Parser parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
 		Printer.print(productions);
+		TableGenerator generator = new TableGenerator(productions, 
+				parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
+		generator.generate();
 	}
 	
 	

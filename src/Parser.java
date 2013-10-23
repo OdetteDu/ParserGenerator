@@ -16,6 +16,7 @@ public class Parser {
 		terminalSymbols.put(EOF.getValue(), EOF);
 	}
 	
+	
 	public ArrayList<Production> parse(ArrayList<ProductionSet> productionSets) throws ParseException
 	{
 		ArrayList<Production> productions = new ArrayList<Production>();
@@ -146,6 +147,15 @@ public class Parser {
 		}
 		
 		return new Symbol(symbol.getValue());
+	}
+
+
+	public HashMap<String, Symbol> getNonTerminalSymbols() {
+		return nonTerminalSymbols;
+	}
+
+	public HashMap<String, Symbol> getTerminalSymbols() {
+		return terminalSymbols;
 	}
 
 }
