@@ -40,4 +40,14 @@ public class Token {
 	{
 		return "("+type+","+value+")";
 	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	
 }
