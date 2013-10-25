@@ -35,5 +35,25 @@ public class Symbol {
 	{
 		return "("+type+","+value+")";
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		try
+		{
+			Symbol s = (Symbol)	obj;
+			return this.type == s.type && this.value.equals(s.value);
+		}
+		catch(Exception e)
+		{
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return this.type.hashCode()+this.value.hashCode();
+	}
 
 }

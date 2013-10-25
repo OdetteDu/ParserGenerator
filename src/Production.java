@@ -47,9 +47,18 @@ public class Production {
 		return terminalSymbols;
 	}
 	
+	public Symbol getLeftHandSide() {
+		return leftHandSide;
+	}
+
 	public Symbol getRightHandSide(int index)
 	{
 		return rightHandSide.get(index);
+	}
+	
+	public int getRightHandSideCount()
+	{
+		return rightHandSide.size();
 	}
 
 }

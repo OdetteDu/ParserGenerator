@@ -33,9 +33,6 @@ public class Parser {
 			terminalSymbols.putAll(productions.get(i).assignSymbolType(nonTerminalSymbols));
 		}
 		
-		Printer.print(nonTerminalSymbols);
-		Printer.print(terminalSymbols);
-		
 		return productions;
 	}
 	

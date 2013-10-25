@@ -36,23 +36,52 @@ public class TableGenerator {
 			HashSet<Symbol> first = new HashSet<Symbol>();
 			firstTable.put(symbol, first);
 		}
-		Printer.print(firstTable);
+		
+		while(generateFirstNonTerminalForOneIteration(firstTable) >0)
+		{
+			//Printer.print("first",firstTable);
+		}
+		
+		Printer.print("First Table",firstTable);
 	}
 	
-	private HashMap<Symbol, HashSet<Symbol>> generateFirstNonTerminalForOneIteration(HashMap<Symbol, 
+	private int generateFirstNonTerminalForOneIteration(HashMap<Symbol, 
 			HashSet<Symbol>> firstTable)
 	{
+		int count = 0;
 		for(int i=0; i<productions.size(); i++)
 		{
 			Production p = productions.get(i);
-			if(p.getRightHandSide(0).getValue() != Parser.EPSILON.getValue())
+			int index=0;
+			HashSet<Symbol> rhs = new HashSet<Symbol>();
+			if(!p.getRightHandSide(0).equals(Parser.EPSILON))
 			{
-				HashSet<Symbol> b0 = firstTable.get(p.getRightHandSide(0));
-				b0.remove(Parser.EPSILON);
-				HashSet<Symbol> rhs = b0;
+				Symbol s = p.getRightHandSide(0);
+				HashSet<Symbol> B0 = firstTable.get(p.getRightHandSide(0));
+				B0.remove(Parser.EPSILON);
+				rhs = B0;
+				index = 0;
+				while(firstTable.get(p.getRightHandSide(0)).contains(Parser.EPSILON) && index <= p.getRightHandSideCount()-2)
+				{
+					HashSet<Symbol> BIndexPlus1 = firstTable.get(p.getRightHandSide(index+1));
+					rhs.addAll(BIndexPlus1);
+					rhs.remove(Parser.EPSILON);
+					index++;
+				}
 			}
+			
+			if(index == p.getRightHandSideCount()-1 && firstTable.get(p.getRightHandSide(index)).contains(Parser.EPSILON) )
+			{
+				rhs.add(Parser.EPSILON);
+			}
+			HashSet<Symbol> A = firstTable.get(p.getLeftHandSide());
+			if(A.addAll(rhs))
+			{
+				count ++;
+			}
+			firstTable.put(p.getLeftHandSide(), A);
 		}
-		return firstTable;
+		return count;
 	}
 	
 	private HashMap<Symbol, HashSet<Symbol>> generateFirstTerminal()

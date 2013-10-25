@@ -1,1 +1,15 @@
+/IllegalCharacterException.class
+/InvalidCommandLineArgumentException.class
+/ParseException.class
+/Parser.class
+/ParserGenerator.class
 /ParserGeneratorTest.class
+/Printer.class
+/Production.class
+/ProductionSet.class
+/Scanner.class
+/Symbol$Type.class
+/Symbol.class
+/TableGenerator.class
+/Token$Type.class
+/Token.class
