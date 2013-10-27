@@ -87,10 +87,22 @@ public class ParserGenerator {
 		}
 		else
 		{
-			String filePath = args[args.length-1];
-			if(filePath.charAt(0)=='-')
+			String filePath = "";
+			for (int i=0; i<args.length; i++)
 			{
-				throw new InvalidCommandLineArgumentException("You must provide a file of input grammar.");
+				String argument = args[i];
+				if (argument.charAt(0) != '-')
+				{
+					if(filePath.isEmpty())
+					{
+						filePath = argument;
+					}
+					else
+					{
+						throw new InvalidCommandLineArgumentException("There are more than one arguments which isn't a flag in the command line argument. "
+								+ "The program can't determine which one is the file path. ");
+					}
+				}
 			}
 			
 			ParserGenerator parserGenerator = new ParserGenerator(filePath);
