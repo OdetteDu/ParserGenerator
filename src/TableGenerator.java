@@ -6,10 +6,10 @@ import java.util.Iterator;
 
 public class TableGenerator {
 
-	private Symbol startSymbol;
-	private HashMap<String, Symbol> nonTerminalSymbols;
-	private HashMap<String, Symbol> terminalSymbols;
-	private ArrayList<Production> productions;
+	private final Symbol startSymbol;
+	private final HashMap<String, Symbol> nonTerminalSymbols;
+	private final HashMap<String, Symbol> terminalSymbols;
+	private final ArrayList<Production> productions;
 
 	private HashMap<Symbol, HashSet<Symbol>> firstTable;
 	private HashMap<Symbol, HashSet<Symbol>> followTable;
@@ -17,28 +17,30 @@ public class TableGenerator {
 	private HashMap<String, HashMap<String, Integer>> parseTable;
 
 	public TableGenerator(Symbol startSymbol, ArrayList<Production> productions,
-			HashMap<String,Symbol> terminalSymbols, HashMap<String,Symbol> nonTerminalSymbols)
+			HashMap<String,Symbol> terminalSymbols, HashMap<String,Symbol> nonTerminalSymbols) throws NotLLOneGrammarException
 	{
 		this.startSymbol = startSymbol;
 		this.productions = productions;
 		this.terminalSymbols = terminalSymbols;
 		terminalSymbols.remove(Symbol.EPSILON.getValue());
 		this.nonTerminalSymbols = nonTerminalSymbols;
-		//Printer.print("Terminal Symbols: ",terminalSymbols);
-		//Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
-		//Printer.print("Productions: ",productions);
+		Printer.print("Terminal Symbols: ",terminalSymbols);
+		Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
+		Printer.print("Productions: ",productions);
+		
+		
 	}
 
 	public void generate() throws NotLLOneGrammarException
 	{
 		firstTable = generateFirst();
-		//Printer.print("First Table: ",firstTable);
+		Printer.print("First Table: ",firstTable);
 		followTable = generateFollow();
-		//Printer.print("Follow Table: ",followTable);
+		Printer.print("Follow Table: ",followTable);
 		firstPlusTable = generateFirstPlus();
-		//Printer.print("First Plus: ",firstPlusTable);
+		Printer.print("First Plus: ",firstPlusTable);
 		parseTable = generateTable();
-		//Printer.print("Parse Table: ", parseTable);
+		Printer.print("Parse Table: ", parseTable);
 	}
 
 	private HashMap<Symbol, HashSet<Symbol>> generateFirst()
@@ -178,12 +180,12 @@ public class TableGenerator {
 					}
 					else
 					{
-						trailer = firstTable.get(Bj);
+						trailer = (HashSet<Symbol>) firstTable.get(Bj).clone();
 					}
 				}
 				else
 				{
-					trailer = firstTable.get(Bj);
+					trailer = (HashSet<Symbol>) firstTable.get(Bj).clone();
 				}
 			}
 		}

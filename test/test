@@ -1,23 +1,9 @@
-Goal   : Expr 
-       ;
+BParens : List
+        ;
 
-Expr   : Term EPrime 
-       ;
+List : Pair List
+     | epsilon
+     ;
 
-EPrime : PLUS  Term EPrime
-       | MINUS Term EPrime
-       | epsilon 
-       ;
-
-Term   : Factor TPrime 
-       ;
-
-TPrime : TIMES Factor TPrime
-       | DIV   Factor TPrime
-       | epsilon 
-       ;
-
-Factor : LP Expr RP
-       | NUMBER
-       | IDENTIFIER
-       ;
+Pair : LParen List RParen
+     ;
