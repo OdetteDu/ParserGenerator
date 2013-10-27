@@ -1,20 +1,14 @@
-Goal   : Expr 
+Goal   : Expr
        ;
 
-Expr   : Term EPrime 
+Expr   : Expr PLUS  Term
+       | Expr MINUS Term
+       | Term
        ;
 
-EPrime : PLUS  Term EPrime
-       | MINUS Term EPrime
-       | epsilon 
-       ;
-
-Term   : Factor TPrime 
-       ;
-
-TPrime : TIMES Factor TPrime
-       | DIV   Factor TPrime
-       | epsilon 
+Term   : Term TIMES  Factor
+       | Term DIVIDE Factor
+       | Factor
        ;
 
 Factor : LP Expr RP

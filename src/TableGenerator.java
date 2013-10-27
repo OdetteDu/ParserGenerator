@@ -29,7 +29,7 @@ public class TableGenerator {
 		Printer.print("Productions: ",productions);
 	}
 
-	public void generate()
+	public void generate() throws NotLLOneGrammarException
 	{
 		firstTable = generateFirst();
 		Printer.print("First Table: ",firstTable);
@@ -53,14 +53,15 @@ public class TableGenerator {
 			firstTable.put(symbol, first);
 		}
 
-		while(generateFirstNonTerminalForOneIteration(firstTable) >0)
+		while(generateFirstNonTerminalForOneIteration(firstTable) > 0)
 		{
-
+			Printer.print(firstTable);
 		}
 
 		return firstTable;
 	}
 
+	@SuppressWarnings("unchecked")
 	private int generateFirstNonTerminalForOneIteration(HashMap<Symbol, 
 			HashSet<Symbol>> firstTable)
 	{
@@ -72,7 +73,7 @@ public class TableGenerator {
 			HashSet<Symbol> rhs = new HashSet<Symbol>();
 			if(!p.getRightHandSide(0).equals(Symbol.EPSILON))
 			{
-				HashSet<Symbol> B0 = firstTable.get(p.getRightHandSide(0));
+				HashSet<Symbol> B0 = (HashSet<Symbol>) firstTable.get(p.getRightHandSide(0)).clone();
 				B0.remove(Symbol.EPSILON);
 				rhs = B0;
 				index = 0;
@@ -209,10 +210,11 @@ public class TableGenerator {
 		return firstPlusTable;
 	}
 
+	@SuppressWarnings("unchecked")
 	private HashSet<Symbol> getFirstFromRightHandSide(ArrayList<Symbol> rightHandSide)
 	{
 		int index = 0;
-		HashSet<Symbol> firstSet = firstTable.get(rightHandSide.get(index));
+		HashSet<Symbol> firstSet = (HashSet<Symbol>) firstTable.get(rightHandSide.get(index)).clone();
 
 		while(firstTable.get(rightHandSide.get(index)).contains(Symbol.EPSILON) && index < rightHandSide.size()-2)
 		{
@@ -223,10 +225,8 @@ public class TableGenerator {
 		return firstSet;
 	}
 
-	private HashMap<String, HashMap<String, Integer>> generateTable()
-	{
-		terminalSymbols.remove(Symbol.EPSILON.getValue());
-		
+	private HashMap<String, HashMap<String, Integer>> generateTable() throws NotLLOneGrammarException
+	{	
 		HashMap<String, HashMap<String, Integer>> parseTable = new HashMap<String, HashMap<String, Integer>>();
 
 		Iterator<String> iterNonTerminal = nonTerminalSymbols.keySet().iterator();
@@ -239,6 +239,8 @@ public class TableGenerator {
 			{
 				row.put(terminalSymbols.get(iterTerminal.next()).getValue(), -1);
 			}
+			
+			row.put(Symbol.EOF.getValue(), -1);
 
 			parseTable.put(nonTerminalSymbols.get(iterNonTerminal.next()).getValue(), row);
 		}
@@ -253,20 +255,41 @@ public class TableGenerator {
 			while(iterFirstPlusADB.hasNext())
 			{
 				Symbol w = iterFirstPlusADB.next();
-				HashMap<String, Integer> row = parseTable.get(A);
-				row.put(w.getValue(), p);
-				parseTable.put(A, row);
+				if(!w.equals(Symbol.EPSILON) && !w.equals(Symbol.EOF) )
+				{
+					HashMap<String, Integer> row = parseTable.get(A);
+					int temp = row.get(w.getValue());
+					if(temp !=-1)
+					{
+						throw new NotLLOneGrammarException();
+					}
+					else
+					{
+						row.put(w.getValue(), p);
+						parseTable.put(A, row);
+					}
+				}
+				
 			}
 			
 			if(firstPlusADerivesB.contains(Symbol.EOF))
 			{
 				HashMap<String, Integer> row = parseTable.get(A);
-				row.put(Symbol.EOF.getValue(), p);
-				parseTable.put(A, row);
+				int temp = row.get(Symbol.EOF.getValue());
+				if(temp != -1)
+				{
+					throw new NotLLOneGrammarException();
+				}
+				else
+				{
+					row.put(Symbol.EOF.getValue(), p);
+					parseTable.put(A, row);
+				}
+				
 			}
 			p++;
 		}
-
+		
 		return parseTable;
 	}
 

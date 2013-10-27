@@ -20,7 +20,7 @@ public class Production {
 		{
 			//s += rightHandSide.get(i).getValue() + " ";
 			Symbol temp = rightHandSide.get(i);
-			s += "("+temp.getType()+","+temp.getValue()+") ";
+			s += temp+" ";
 		}
 		return s;
 	}

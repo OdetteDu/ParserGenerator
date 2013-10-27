@@ -40,7 +40,7 @@ public class Scanner {
 		for(int i=0; i<currentLine.length(); i++)
 		{
 			char c=currentLine.charAt(i);
-			if(c==' ' || c=='\n' || c==-1)
+			if(c==' ' || c=='\n' || c=='\t' || c==-1)
 			{
 				Token token = stringToToken(temp);
 				if(token != null)
