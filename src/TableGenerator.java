@@ -5,15 +5,16 @@ import java.util.Iterator;
 
 
 public class TableGenerator {
-	
+
 	private HashMap<String, Symbol> nonTerminalSymbols;
 	private HashMap<String, Symbol> terminalSymbols;
 	private ArrayList<Production> productions;
-	
+
 	private HashMap<Symbol, HashSet<Symbol>> firstTable;
 	private HashMap<Symbol, HashSet<Symbol>> followTable;
 	private HashMap<Production, HashSet<Symbol>> firstPlusTable;
-	
+	private HashMap<String, HashMap<String, Integer>> parseTable;
+
 	public TableGenerator(ArrayList<Production> productions,
 			HashMap<String,Symbol> terminalSymbols, HashMap<String,Symbol> nonTerminalSymbols)
 	{
@@ -21,19 +22,23 @@ public class TableGenerator {
 		this.terminalSymbols = terminalSymbols;
 		this.nonTerminalSymbols = nonTerminalSymbols;
 	}
-	
+
 	public void generate()
 	{
 		firstTable = generateFirst();
+		Printer.print("First Table: ",firstTable);
 		followTable = generateFollow();
+		Printer.print("Follow Table: ",followTable);
 		firstPlusTable = generateFirstPlus();
-		Printer.print(firstPlusTable);
+		Printer.print("First Plus: ",firstPlusTable);
+		parseTable = generateTable();
+		Printer.print("Parse Table: ", parseTable);
 	}
-	
+
 	private HashMap<Symbol, HashSet<Symbol>> generateFirst()
 	{
 		HashMap<Symbol, HashSet<Symbol>> firstTable = generateFirstTerminal();
-		
+
 		Iterator<String> iterNonTerminal = nonTerminalSymbols.keySet().iterator();
 		while(iterNonTerminal.hasNext())
 		{
@@ -41,16 +46,16 @@ public class TableGenerator {
 			HashSet<Symbol> first = new HashSet<Symbol>();
 			firstTable.put(symbol, first);
 		}
-		
+
 		while(generateFirstNonTerminalForOneIteration(firstTable) >0)
 		{
 			//Printer.print("first",firstTable);
 		}
-		
+
 		//Printer.print("First Table",firstTable);
 		return firstTable;
 	}
-	
+
 	private int generateFirstNonTerminalForOneIteration(HashMap<Symbol, 
 			HashSet<Symbol>> firstTable)
 	{
@@ -74,7 +79,7 @@ public class TableGenerator {
 					index++;
 				}
 			}
-			
+
 			if(index == p.getRightHandSideCount()-1 && firstTable.get(p.getRightHandSide(index)).contains(Parser.EPSILON) )
 			{
 				rhs.add(Parser.EPSILON);
@@ -88,11 +93,11 @@ public class TableGenerator {
 		}
 		return count;
 	}
-	
+
 	private HashMap<Symbol, HashSet<Symbol>> generateFirstTerminal()
 	{
 		HashMap<Symbol, HashSet<Symbol>> firstTable = new HashMap<Symbol, HashSet<Symbol>>();
-		
+
 		Iterator<String> iterTerminal = terminalSymbols.keySet().iterator();
 		while(iterTerminal.hasNext())
 		{
@@ -101,14 +106,14 @@ public class TableGenerator {
 			first.add(symbol);
 			firstTable.put(symbol, first);
 		}
-		
+
 		return firstTable;
 	}
-	
+
 	private HashMap<Symbol, HashSet<Symbol>> generateFollow()
 	{
 		HashMap<Symbol, HashSet<Symbol>> followTable = new HashMap<Symbol, HashSet<Symbol>>();
-		
+
 		Iterator<String> iterNonTerminal = nonTerminalSymbols.keySet().iterator();
 		while(iterNonTerminal.hasNext())
 		{
@@ -116,17 +121,17 @@ public class TableGenerator {
 			HashSet<Symbol> follow = new HashSet<Symbol>();
 			followTable.put(symbol, follow);
 		}
-		
+
 		//TODO EOF -> Follow(S)
-		
+
 		while(generateFollowForOneIteration(followTable)>0)
 		{
-			
+
 		}
-		
+
 		return followTable;
 	}
-	
+
 	private int generateFollowForOneIteration(HashMap<Symbol, HashSet<Symbol>> followTable)
 	{
 		int count = 0;
@@ -146,7 +151,7 @@ public class TableGenerator {
 						count++;
 					}
 					followTable.put(Bj, followBj);
-					
+
 					if(firstTable.get(Bj).contains(Parser.EPSILON))
 					{
 						HashSet<Symbol> firstBj = firstTable.get(Bj);
@@ -164,14 +169,14 @@ public class TableGenerator {
 				}
 			}
 		}
-		
+
 		return count;
 	}
-	
+
 	private HashMap<Production, HashSet<Symbol>> generateFirstPlus()
 	{
 		HashMap<Production, HashSet<Symbol>> firstPlusTable = new HashMap<Production, HashSet<Symbol>>();
-		
+
 		for (int i=0; i<productions.size(); i++)
 		{
 			Production production = productions.get(i);
@@ -183,22 +188,69 @@ public class TableGenerator {
 			HashSet<Symbol> firstPlusADerivesB = firstBeta;
 			firstPlusTable.put(production, firstPlusADerivesB);
 		}
-		
+
 		return firstPlusTable;
 	}
-	
+
 	private HashSet<Symbol> getFirstFromRightHandSide(ArrayList<Symbol> rightHandSide)
 	{
 		int index = 0;
 		HashSet<Symbol> firstSet = firstTable.get(rightHandSide.get(index));
-		
-		while(firstTable.get(rightHandSide.get(index)).contains(Parser.EPSILON))
+
+		while(firstTable.get(rightHandSide.get(index)).contains(Parser.EPSILON) && index < rightHandSide.size()-2)
 		{
 			index++;
 			firstSet.addAll(firstTable.get(rightHandSide.get(index)));
 		}
-		
+
 		return firstSet;
+	}
+
+	private HashMap<String, HashMap<String, Integer>> generateTable()
+	{
+		terminalSymbols.remove(Parser.EPSILON.getValue());
+		
+		HashMap<String, HashMap<String, Integer>> parseTable = new HashMap<String, HashMap<String, Integer>>();
+
+		Iterator<String> iterNonTerminal = nonTerminalSymbols.keySet().iterator();
+		while(iterNonTerminal.hasNext())
+		{
+			HashMap<String, Integer> row = new HashMap<String, Integer>();
+
+			Iterator<String> iterTerminal = terminalSymbols.keySet().iterator();
+			while (iterTerminal.hasNext())
+			{
+				row.put(terminalSymbols.get(iterTerminal.next()).getValue(), -1);
+			}
+
+			parseTable.put(nonTerminalSymbols.get(iterNonTerminal.next()).getValue(), row);
+		}
+
+		int p = 0;
+		while(p < productions.size())
+		{
+			Production production = productions.get(p);
+			String A = production.getLeftHandSide().getValue();
+			HashSet<Symbol> firstPlusADerivesB = firstPlusTable.get(production);
+			Iterator<Symbol> iterFirstPlusADB = firstPlusADerivesB.iterator();
+			while(iterFirstPlusADB.hasNext())
+			{
+				Symbol w = iterFirstPlusADB.next();
+				HashMap<String, Integer> row = parseTable.get(A);
+				row.put(w.getValue(), p);
+				parseTable.put(A, row);
+			}
+			
+			if(firstPlusADerivesB.contains(Parser.EOF))
+			{
+				HashMap<String, Integer> row = parseTable.get(A);
+				row.put(Parser.EOF.getValue(), p);
+				parseTable.put(A, row);
+			}
+			p++;
+		}
+
+		return parseTable;
 	}
 
 }

@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 
 public class Printer<E> {
@@ -38,5 +39,17 @@ public class Printer<E> {
 		}
 		
 		System.out.println();
+	}
+	
+	public static void print(int [][] toBePrinted)
+	{
+		for(int i=0; i<toBePrinted.length; i++)
+		{
+			for(int j=0; j<toBePrinted[0].length; j++)
+			{
+				System.out.print(toBePrinted[i][j]+" ");
+			}
+			System.out.println();
+		}
 	}
 }

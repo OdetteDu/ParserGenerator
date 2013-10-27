@@ -33,7 +33,8 @@ public class Symbol {
 	
 	public String toString()
 	{
-		return "("+type+","+value+")";
+		//return "("+type+","+value+")";
+		return value;
 	}
 	
 	@Override
