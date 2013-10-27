@@ -19,7 +19,7 @@ public class ParserGenerator {
 		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
 		Parser parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
-		TableGenerator generator = new TableGenerator(productions, 
+		TableGenerator generator = new TableGenerator(parser.getStartSymbol(), productions, 
 				parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
 		generator.generate();
 	}

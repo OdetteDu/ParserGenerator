@@ -1,22 +1,24 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class Parser {
 	
-	public static Symbol EOF = new Symbol(Symbol.Type.TERMINAL, "EOF");
-	public static Symbol EPSILON = new Symbol(Symbol.Type.TERMINAL, "EPSILON");
+	
 	
 	private HashMap<String, Symbol> nonTerminalSymbols;
 	private HashMap<String, Symbol> terminalSymbols;
+	private Symbol startSymbol;
 	
 	public Parser()
 	{
 		nonTerminalSymbols = new HashMap<String, Symbol>();
 		terminalSymbols = new HashMap<String, Symbol>();
-		terminalSymbols.put(EOF.getValue(), EOF);
+		//terminalSymbols.put(EOF.getValue(), EOF);
 	}
 	
 	
+	@SuppressWarnings("unchecked")
 	public ArrayList<Production> parse(ArrayList<ProductionSet> productionSets) throws ParseException
 	{
 		ArrayList<Production> productions = new ArrayList<Production>();
@@ -28,9 +30,27 @@ public class Parser {
 		}
 		
 		//sets symbol type
+		HashMap<String, Symbol> nonTerminalsWhichAppearOnTheRightSide = new HashMap<String, Symbol>();
 		for (int i=0; i<productions.size(); i++)
 		{
-			terminalSymbols.putAll(productions.get(i).assignSymbolType(nonTerminalSymbols));
+			nonTerminalsWhichAppearOnTheRightSide.putAll(productions.get(i).assignSymbolType(nonTerminalSymbols, terminalSymbols));
+		}
+		
+		//get start symbol
+		Iterator<String> iter = nonTerminalsWhichAppearOnTheRightSide.keySet().iterator();
+		HashMap<String, Symbol> temp = (HashMap<String, Symbol>) nonTerminalSymbols.clone();
+		while (iter.hasNext())
+		{
+			temp.remove(iter.next());
+		}
+		if(temp.size() == 1)
+		{
+			String start = temp.keySet().iterator().next();
+			startSymbol = temp.get(start);
+		}
+		else
+		{
+			throw new ParseException("This grammar contains "+temp.size()+" start symbols");
 		}
 		
 		return productions;
@@ -110,7 +130,7 @@ public class Parser {
 			else
 			{
 				ArrayList<Symbol> symbols = new ArrayList<Symbol>();
-				symbols.add(EPSILON);
+				symbols.add(Symbol.EPSILON);
 				return new Production(leftHandSide, symbols);
 			}
 		}
@@ -155,4 +175,8 @@ public class Parser {
 		return terminalSymbols;
 	}
 
+
+	public Symbol getStartSymbol() {
+		return startSymbol;
+	}
 }

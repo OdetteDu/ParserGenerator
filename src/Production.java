@@ -25,9 +25,10 @@ public class Production {
 		return s;
 	}
 	
-	public HashMap<String, Symbol> assignSymbolType(HashMap<String, Symbol> nonTerminalSymbols)
+	//return the NT which appear on the right hand side
+	public HashMap<String, Symbol> assignSymbolType(HashMap<String, Symbol> nonTerminalSymbols, HashMap<String, Symbol> terminalSymbols )
 	{
-		HashMap<String, Symbol> terminalSymbols = new HashMap<String, Symbol>();
+		HashMap<String, Symbol> nonTerminalsWhichAppearOnTheRightSide = new HashMap<String, Symbol>();
 		
 		for (int i=0; i<rightHandSide.size(); i++)
 		{
@@ -35,6 +36,7 @@ public class Production {
 			if(nonTerminalSymbols.get(temp.getValue())!=null)
 			{
 				temp.setType(Symbol.Type.NONTERMINAL);
+				nonTerminalsWhichAppearOnTheRightSide.put(temp.getValue(), temp);
 			}
 			else
 			{
@@ -44,7 +46,7 @@ public class Production {
 			rightHandSide.set(i, temp);
 		}
 		
-		return terminalSymbols;
+		return nonTerminalsWhichAppearOnTheRightSide;
 	}
 	
 	public Symbol getLeftHandSide() {

@@ -6,6 +6,7 @@ import java.util.Iterator;
 
 public class TableGenerator {
 
+	private Symbol startSymbol;
 	private HashMap<String, Symbol> nonTerminalSymbols;
 	private HashMap<String, Symbol> terminalSymbols;
 	private ArrayList<Production> productions;
@@ -15,12 +16,17 @@ public class TableGenerator {
 	private HashMap<Production, HashSet<Symbol>> firstPlusTable;
 	private HashMap<String, HashMap<String, Integer>> parseTable;
 
-	public TableGenerator(ArrayList<Production> productions,
+	public TableGenerator(Symbol startSymbol, ArrayList<Production> productions,
 			HashMap<String,Symbol> terminalSymbols, HashMap<String,Symbol> nonTerminalSymbols)
 	{
+		this.startSymbol = startSymbol;
 		this.productions = productions;
 		this.terminalSymbols = terminalSymbols;
+		terminalSymbols.remove(Symbol.EPSILON.getValue());
 		this.nonTerminalSymbols = nonTerminalSymbols;
+		Printer.print("Terminal Symbols: ",terminalSymbols);
+		Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
+		Printer.print("Productions: ",productions);
 	}
 
 	public void generate()
@@ -49,10 +55,9 @@ public class TableGenerator {
 
 		while(generateFirstNonTerminalForOneIteration(firstTable) >0)
 		{
-			//Printer.print("first",firstTable);
+
 		}
 
-		//Printer.print("First Table",firstTable);
 		return firstTable;
 	}
 
@@ -65,24 +70,24 @@ public class TableGenerator {
 			Production p = productions.get(i);
 			int index=0;
 			HashSet<Symbol> rhs = new HashSet<Symbol>();
-			if(!p.getRightHandSide(0).equals(Parser.EPSILON))
+			if(!p.getRightHandSide(0).equals(Symbol.EPSILON))
 			{
 				HashSet<Symbol> B0 = firstTable.get(p.getRightHandSide(0));
-				B0.remove(Parser.EPSILON);
+				B0.remove(Symbol.EPSILON);
 				rhs = B0;
 				index = 0;
-				while(firstTable.get(p.getRightHandSide(0)).contains(Parser.EPSILON) && index <= p.getRightHandSideCount()-2)
+				while(firstTable.get(p.getRightHandSide(0)).contains(Symbol.EPSILON) && index <= p.getRightHandSideCount()-2)
 				{
 					HashSet<Symbol> BIndexPlus1 = firstTable.get(p.getRightHandSide(index+1));
 					rhs.addAll(BIndexPlus1);
-					rhs.remove(Parser.EPSILON);
+					rhs.remove(Symbol.EPSILON);
 					index++;
 				}
 			}
 
-			if(index == p.getRightHandSideCount()-1 && firstTable.get(p.getRightHandSide(index)).contains(Parser.EPSILON) )
+			if(index == p.getRightHandSideCount()-1 && firstTable.get(p.getRightHandSide(index)).contains(Symbol.EPSILON))
 			{
-				rhs.add(Parser.EPSILON);
+				rhs.add(Symbol.EPSILON);
 			}
 			HashSet<Symbol> A = firstTable.get(p.getLeftHandSide());
 			if(A.addAll(rhs))
@@ -97,7 +102,15 @@ public class TableGenerator {
 	private HashMap<Symbol, HashSet<Symbol>> generateFirstTerminal()
 	{
 		HashMap<Symbol, HashSet<Symbol>> firstTable = new HashMap<Symbol, HashSet<Symbol>>();
-
+		
+		HashSet<Symbol> firstEOF = new HashSet<Symbol>();
+		firstEOF.add(Symbol.EOF);
+		firstTable.put(Symbol.EOF, firstEOF);
+		
+		HashSet<Symbol> firstEPSILON = new HashSet<Symbol>();
+		firstEPSILON.add(Symbol.EPSILON);
+		firstTable.put(Symbol.EPSILON, firstEPSILON);
+		
 		Iterator<String> iterTerminal = terminalSymbols.keySet().iterator();
 		while(iterTerminal.hasNext())
 		{
@@ -106,7 +119,7 @@ public class TableGenerator {
 			first.add(symbol);
 			firstTable.put(symbol, first);
 		}
-
+		
 		return firstTable;
 	}
 
@@ -122,7 +135,10 @@ public class TableGenerator {
 			followTable.put(symbol, follow);
 		}
 
-		//TODO EOF -> Follow(S)
+		//EOF -> Follow(S)
+		HashSet<Symbol> followStart = new HashSet<Symbol>();
+		followStart.add(Symbol.EOF);
+		followTable.put(startSymbol, followStart);
 
 		while(generateFollowForOneIteration(followTable)>0)
 		{
@@ -132,6 +148,7 @@ public class TableGenerator {
 		return followTable;
 	}
 
+	@SuppressWarnings("unchecked")
 	private int generateFollowForOneIteration(HashMap<Symbol, HashSet<Symbol>> followTable)
 	{
 		int count = 0;
@@ -139,7 +156,7 @@ public class TableGenerator {
 		for(int i=0; i<productions.size(); i++)
 		{
 			Production p = productions.get(i);
-			trailer = followTable.get(p.getLeftHandSide());
+			trailer = (HashSet<Symbol>) followTable.get(p.getLeftHandSide()).clone();
 			for (int j=p.getRightHandSideCount()-1; j>=0; j--)
 			{
 				Symbol Bj = p.getRightHandSide(j);
@@ -152,10 +169,10 @@ public class TableGenerator {
 					}
 					followTable.put(Bj, followBj);
 
-					if(firstTable.get(Bj).contains(Parser.EPSILON))
+					if(firstTable.get(Bj).contains(Symbol.EPSILON))
 					{
-						HashSet<Symbol> firstBj = firstTable.get(Bj);
-						firstBj.remove(Parser.EPSILON);
+						HashSet<Symbol> firstBj = (HashSet<Symbol>) firstTable.get(Bj).clone();
+						firstBj.remove(Symbol.EPSILON);
 						trailer.addAll(firstBj);
 					}
 					else
@@ -181,7 +198,7 @@ public class TableGenerator {
 		{
 			Production production = productions.get(i);
 			HashSet<Symbol> firstBeta = getFirstFromRightHandSide(production.getRightHandSide());
-			if(firstBeta.contains(Parser.EPSILON))
+			if(firstBeta.contains(Symbol.EPSILON))
 			{
 				firstBeta.addAll(followTable.get(production.getLeftHandSide()));
 			}
@@ -197,7 +214,7 @@ public class TableGenerator {
 		int index = 0;
 		HashSet<Symbol> firstSet = firstTable.get(rightHandSide.get(index));
 
-		while(firstTable.get(rightHandSide.get(index)).contains(Parser.EPSILON) && index < rightHandSide.size()-2)
+		while(firstTable.get(rightHandSide.get(index)).contains(Symbol.EPSILON) && index < rightHandSide.size()-2)
 		{
 			index++;
 			firstSet.addAll(firstTable.get(rightHandSide.get(index)));
@@ -208,7 +225,7 @@ public class TableGenerator {
 
 	private HashMap<String, HashMap<String, Integer>> generateTable()
 	{
-		terminalSymbols.remove(Parser.EPSILON.getValue());
+		terminalSymbols.remove(Symbol.EPSILON.getValue());
 		
 		HashMap<String, HashMap<String, Integer>> parseTable = new HashMap<String, HashMap<String, Integer>>();
 
@@ -241,10 +258,10 @@ public class TableGenerator {
 				parseTable.put(A, row);
 			}
 			
-			if(firstPlusADerivesB.contains(Parser.EOF))
+			if(firstPlusADerivesB.contains(Symbol.EOF))
 			{
 				HashMap<String, Integer> row = parseTable.get(A);
-				row.put(Parser.EOF.getValue(), p);
+				row.put(Symbol.EOF.getValue(), p);
 				parseTable.put(A, row);
 			}
 			p++;
