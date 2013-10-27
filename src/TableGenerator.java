@@ -324,10 +324,10 @@ public class TableGenerator {
 		s += "]\n";
 
 		//eof-maker: <EOF>
-		s += "eof-maker: "+Symbol.EOF.getValue()+"\n";
+		s += "eof-marker: "+Symbol.EOF.getValue()+"\n";
 
 		//error-maker: --
-		s += "error-maker: --\n";
+		s += "error-marker: --\n";
 
 		//start-symbol: B
 		s += "start-symbol: "+startSymbol.getValue()+"\n\n";
@@ -336,14 +336,21 @@ public class TableGenerator {
 		s += "productions: \n";
 		for (int i=0; i<productions.size(); i++)
 		{
-			s += i + ": {";
+			s += "  " + i + ": {";
 			Production p = productions.get(i);
 			s += p.getLeftHandSide().getValue()+": "+"[";
 			int j;
 			for (j=0; j<p.getRightHandSideCount(); j++)
 			{
 				Symbol rhsj = p.getRightHandSide(j);
-				s += rhsj.getValue() + ", ";
+				if (!rhsj.equals(Symbol.EPSILON))
+				{
+					s += rhsj.getValue() + ", ";
+				}
+				else
+				{
+					s += ", ";
+				}
 			}
 			if( j!=0)
 			{
@@ -359,7 +366,7 @@ public class TableGenerator {
 		while(iterTable.hasNext())
 		{
 			String nt = iterTable.next();
-			s += nt+": " + "{";
+			s += "  " + nt+": " + "{";
 			HashMap<String, Integer> row = parseTable.get(nt);
 			Iterator<String> iterRow = row.keySet().iterator();
 			while(iterRow.hasNext())
