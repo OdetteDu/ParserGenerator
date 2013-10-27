@@ -12,6 +12,7 @@ public class TableGenerator {
 	
 	private HashMap<Symbol, HashSet<Symbol>> firstTable;
 	private HashMap<Symbol, HashSet<Symbol>> followTable;
+	private HashMap<Production, HashSet<Symbol>> firstPlusTable;
 	
 	public TableGenerator(ArrayList<Production> productions,
 			HashMap<String,Symbol> terminalSymbols, HashMap<String,Symbol> nonTerminalSymbols)
@@ -24,8 +25,9 @@ public class TableGenerator {
 	public void generate()
 	{
 		firstTable = generateFirst();
-		generateFollow();
-		generateFirstPlus();
+		followTable = generateFollow();
+		firstPlusTable = generateFirstPlus();
+		Printer.print(firstPlusTable);
 	}
 	
 	private HashMap<Symbol, HashSet<Symbol>> generateFirst()
@@ -103,7 +105,7 @@ public class TableGenerator {
 		return firstTable;
 	}
 	
-	private void generateFollow()
+	private HashMap<Symbol, HashSet<Symbol>> generateFollow()
 	{
 		HashMap<Symbol, HashSet<Symbol>> followTable = new HashMap<Symbol, HashSet<Symbol>>();
 		
@@ -119,8 +121,10 @@ public class TableGenerator {
 		
 		while(generateFollowForOneIteration(followTable)>0)
 		{
-			Printer.print("Follow Table", followTable);
+			
 		}
+		
+		return followTable;
 	}
 	
 	private int generateFollowForOneIteration(HashMap<Symbol, HashSet<Symbol>> followTable)
@@ -164,9 +168,37 @@ public class TableGenerator {
 		return count;
 	}
 	
-	private void generateFirstPlus()
+	private HashMap<Production, HashSet<Symbol>> generateFirstPlus()
 	{
+		HashMap<Production, HashSet<Symbol>> firstPlusTable = new HashMap<Production, HashSet<Symbol>>();
 		
+		for (int i=0; i<productions.size(); i++)
+		{
+			Production production = productions.get(i);
+			HashSet<Symbol> firstBeta = getFirstFromRightHandSide(production.getRightHandSide());
+			if(firstBeta.contains(Parser.EPSILON))
+			{
+				firstBeta.addAll(followTable.get(production.getLeftHandSide()));
+			}
+			HashSet<Symbol> firstPlusADerivesB = firstBeta;
+			firstPlusTable.put(production, firstPlusADerivesB);
+		}
+		
+		return firstPlusTable;
+	}
+	
+	private HashSet<Symbol> getFirstFromRightHandSide(ArrayList<Symbol> rightHandSide)
+	{
+		int index = 0;
+		HashSet<Symbol> firstSet = firstTable.get(rightHandSide.get(index));
+		
+		while(firstTable.get(rightHandSide.get(index)).contains(Parser.EPSILON))
+		{
+			index++;
+			firstSet.addAll(firstTable.get(rightHandSide.get(index)));
+		}
+		
+		return firstSet;
 	}
 
 }

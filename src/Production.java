@@ -51,6 +51,10 @@ public class Production {
 		return leftHandSide;
 	}
 
+	public ArrayList<Symbol> getRightHandSide() {
+		return rightHandSide;
+	}
+
 	public Symbol getRightHandSide(int index)
 	{
 		return rightHandSide.get(index);
