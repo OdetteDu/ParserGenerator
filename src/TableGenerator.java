@@ -24,9 +24,9 @@ public class TableGenerator {
 		this.terminalSymbols = terminalSymbols;
 		terminalSymbols.remove(Symbol.EPSILON.getValue());
 		this.nonTerminalSymbols = nonTerminalSymbols;
-		Printer.print("Terminal Symbols: ",terminalSymbols);
-		Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
-		Printer.print("Productions: ",productions);
+		//Printer.print("Terminal Symbols: ",terminalSymbols);
+		//Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
+		//Printer.print("Productions: ",productions);
 		
 		
 	}
@@ -34,13 +34,13 @@ public class TableGenerator {
 	public void generate() throws NotLLOneGrammarException
 	{
 		firstTable = generateFirst();
-		Printer.print("First Table: ",firstTable);
+		//Printer.print("First Table: ",firstTable);
 		followTable = generateFollow();
-		Printer.print("Follow Table: ",followTable);
+		//Printer.print("Follow Table: ",followTable);
 		firstPlusTable = generateFirstPlus();
-		Printer.print("First Plus: ",firstPlusTable);
+		//Printer.print("First Plus: ",firstPlusTable);
 		parseTable = generateTable();
-		Printer.print("Parse Table: ", parseTable);
+		//Printer.print("Parse Table: ", parseTable);
 	}
 
 	private HashMap<Symbol, HashSet<Symbol>> generateFirst()

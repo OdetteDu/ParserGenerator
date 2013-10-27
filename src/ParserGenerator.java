@@ -105,10 +105,15 @@ public class ParserGenerator {
 				}
 			}
 			
+			if (filePath.isEmpty())
+			{
+				throw new InvalidCommandLineArgumentException("Did not provide any input file.");
+			}
+			
 			ParserGenerator parserGenerator = new ParserGenerator(filePath);
 			parserGenerator.run();
 			
-			for( int i=0; i<args.length-1; i++)
+			for( int i=0; i<args.length; i++)
 			{
 				if(args[i].equals("-t"))
 				{
@@ -138,6 +143,18 @@ public class ParserGenerator {
 					System.out.println(parserGenerator.getFollowSets());
 					System.out.println(parserGenerator.getFirstPlusSets());
 				}
+				else if(args[i].equals("-?"))
+				{
+					System.out.println("Help Menu: \n"+
+							"-t Print the LL(1) table in YAML format\n"+
+							"-p Print the productions as recognized by the parser in a human readable form\n"+
+							"-f Print the FIRST sets for each grammar symbol in a human readable form\n"+
+							"-g Print the FOLLOW sets for each nonterminal in a human readable form\n"+
+							"-h Print the FIRST+ sets for each production in a human readable form\n"+
+							"-a Print everything in a human readable form\n"+
+							"-? Print a list of the valid command-line flags");
+				}
+						
 			}
 		}
 	}
