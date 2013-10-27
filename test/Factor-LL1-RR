@@ -3,7 +3,7 @@ Goal : Factor
 
 Factor : name ArgList
        | number
-       | ( Expr )
+       | LP Expr RP
        ;
 
 ArgList : LP ExprList RP

@@ -6,6 +6,10 @@ import java.util.ArrayList;
 public class ParserGenerator {
 	
 	private String inputGrammarPath;
+	BufferedReader bufferedFileReader;
+	Scanner scanner;
+	Parser parser;
+	TableGenerator generator;
 	
 	public ParserGenerator(String inputGrammarPath)
 	{
@@ -14,12 +18,12 @@ public class ParserGenerator {
 	
 	public void run() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException
 	{
-		BufferedReader bufferedFileReader = openFile(inputGrammarPath);
-		Scanner scanner = new Scanner();
+		bufferedFileReader = openFile(inputGrammarPath);
+		scanner = new Scanner();
 		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
-		Parser parser = new Parser();
+		parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
-		TableGenerator generator = new TableGenerator(parser.getStartSymbol(), productions, 
+		generator = new TableGenerator(parser.getStartSymbol(), productions, 
 				parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
 		generator.generate();
 	}
@@ -42,27 +46,27 @@ public class ParserGenerator {
 	
 	public String getLLOneTable()
 	{
-		return null;
+		return generator.getLLOneTableInYAML();
 	}
 	
 	public String getProductions()
 	{
-		return null;	
+		return generator.getProductions();	
 	}
 	
 	public String getFirstSets()
 	{
-		return null;
+		return generator.getFirstSets();
 	}
 	
 	public String getFollowSets()
 	{
-		return null;
+		return generator.getFollowSets();
 	}
 	
 	public String getFirstPlusSets()
 	{
-		return null;
+		return generator.getFirstPlusSets();
 	}
 
 	public static void main (String [] args) throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException
@@ -78,6 +82,7 @@ public class ParserGenerator {
 					"-f Print the FIRST sets for each grammar symbol in a human readable form\n"+
 					"-g Print the FOLLOW sets for each nonterminal in a human readable form\n"+
 					"-h Print the FIRST+ sets for each production in a human readable form\n"+
+					"-a Print everything in a human readable form\n"+
 					"-? Print a list of the valid command-line flags");
 		}
 		else
@@ -111,6 +116,14 @@ public class ParserGenerator {
 				}
 				else if(args[i].equals("-h"))
 				{
+					System.out.println(parserGenerator.getFirstPlusSets());
+				}
+				else if(args[i].equals("-a"))
+				{
+					System.out.println(parserGenerator.getLLOneTable());
+					System.out.println(parserGenerator.getProductions());
+					System.out.println(parserGenerator.getFirstSets());
+					System.out.println(parserGenerator.getFollowSets());
 					System.out.println(parserGenerator.getFirstPlusSets());
 				}
 			}

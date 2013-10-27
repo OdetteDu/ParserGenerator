@@ -22,6 +22,10 @@ public class Production {
 			Symbol temp = rightHandSide.get(i);
 			s += temp+" ";
 		}
+		if(rightHandSide.size() != 0)
+		{
+			s = s.substring(0, s.length()-1);
+		}
 		return s;
 	}
 	

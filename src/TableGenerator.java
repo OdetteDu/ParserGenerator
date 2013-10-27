@@ -24,21 +24,21 @@ public class TableGenerator {
 		this.terminalSymbols = terminalSymbols;
 		terminalSymbols.remove(Symbol.EPSILON.getValue());
 		this.nonTerminalSymbols = nonTerminalSymbols;
-		Printer.print("Terminal Symbols: ",terminalSymbols);
-		Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
-		Printer.print("Productions: ",productions);
+		//Printer.print("Terminal Symbols: ",terminalSymbols);
+		//Printer.print("NonTerminal Symbols: ",nonTerminalSymbols);
+		//Printer.print("Productions: ",productions);
 	}
 
 	public void generate() throws NotLLOneGrammarException
 	{
 		firstTable = generateFirst();
-		Printer.print("First Table: ",firstTable);
+		//Printer.print("First Table: ",firstTable);
 		followTable = generateFollow();
-		Printer.print("Follow Table: ",followTable);
+		//Printer.print("Follow Table: ",followTable);
 		firstPlusTable = generateFirstPlus();
-		Printer.print("First Plus: ",firstPlusTable);
+		//Printer.print("First Plus: ",firstPlusTable);
 		parseTable = generateTable();
-		Printer.print("Parse Table: ", parseTable);
+		//Printer.print("Parse Table: ", parseTable);
 	}
 
 	private HashMap<Symbol, HashSet<Symbol>> generateFirst()
@@ -55,7 +55,7 @@ public class TableGenerator {
 
 		while(generateFirstNonTerminalForOneIteration(firstTable) > 0)
 		{
-			Printer.print(firstTable);
+
 		}
 
 		return firstTable;
@@ -103,15 +103,15 @@ public class TableGenerator {
 	private HashMap<Symbol, HashSet<Symbol>> generateFirstTerminal()
 	{
 		HashMap<Symbol, HashSet<Symbol>> firstTable = new HashMap<Symbol, HashSet<Symbol>>();
-		
+
 		HashSet<Symbol> firstEOF = new HashSet<Symbol>();
 		firstEOF.add(Symbol.EOF);
 		firstTable.put(Symbol.EOF, firstEOF);
-		
+
 		HashSet<Symbol> firstEPSILON = new HashSet<Symbol>();
 		firstEPSILON.add(Symbol.EPSILON);
 		firstTable.put(Symbol.EPSILON, firstEPSILON);
-		
+
 		Iterator<String> iterTerminal = terminalSymbols.keySet().iterator();
 		while(iterTerminal.hasNext())
 		{
@@ -120,7 +120,7 @@ public class TableGenerator {
 			first.add(symbol);
 			firstTable.put(symbol, first);
 		}
-		
+
 		return firstTable;
 	}
 
@@ -239,7 +239,7 @@ public class TableGenerator {
 			{
 				row.put(terminalSymbols.get(iterTerminal.next()).getValue(), -1);
 			}
-			
+
 			row.put(Symbol.EOF.getValue(), -1);
 
 			parseTable.put(nonTerminalSymbols.get(iterNonTerminal.next()).getValue(), row);
@@ -269,9 +269,9 @@ public class TableGenerator {
 						parseTable.put(A, row);
 					}
 				}
-				
+
 			}
-			
+
 			if(firstPlusADerivesB.contains(Symbol.EOF))
 			{
 				HashMap<String, Integer> row = parseTable.get(A);
@@ -285,12 +285,201 @@ public class TableGenerator {
 					row.put(Symbol.EOF.getValue(), p);
 					parseTable.put(A, row);
 				}
-				
+
 			}
 			p++;
 		}
-		
+
 		return parseTable;
+	}
+
+	public String getLLOneTableInYAML()
+	{
+		String s = "";
+
+		//terminals: [a, b]
+		s += "terminals: [";
+		Iterator<String> iterTerminals = terminalSymbols.keySet().iterator();
+		while (iterTerminals.hasNext())
+		{
+			s += iterTerminals.next()+", ";
+		}
+		if(terminalSymbols.size() != 0)
+		{
+			s = s.substring(0, s.length()-2);
+		}
+		s += "]\n";
+
+		//non-terminals: [B]
+		s += "non-terminals: [";
+		Iterator<String> iterNonTerminals = nonTerminalSymbols.keySet().iterator();
+		while (iterNonTerminals.hasNext())
+		{
+			s += iterNonTerminals.next()+", ";
+		}
+		if(nonTerminalSymbols.size() != 0)
+		{
+			s = s.substring(0, s.length()-2);
+		}
+		s += "]\n";
+
+		//eof-maker: <EOF>
+		s += "eof-maker: "+Symbol.EOF.getValue()+"\n";
+
+		//error-maker: --
+		s += "error-maker: --\n";
+
+		//start-symbol: B
+		s += "start-symbol: "+startSymbol.getValue()+"\n\n";
+
+		//productions: 0: {B: [a, B, b]}
+		s += "productions: \n";
+		for (int i=0; i<productions.size(); i++)
+		{
+			s += i + ": {";
+			Production p = productions.get(i);
+			s += p.getLeftHandSide().getValue()+": "+"[";
+			int j;
+			for (j=0; j<p.getRightHandSideCount(); j++)
+			{
+				Symbol rhsj = p.getRightHandSide(j);
+				s += rhsj.getValue() + ", ";
+			}
+			if( j!=0)
+			{
+				s = s.substring(0, s.length()-2);
+			}
+			s += "]}\n";
+		}
+		s += "\n";
+
+		//table: B: {b: 1, a: 0, <EOF>:1}
+		s += "table: \n";
+		Iterator<String> iterTable = parseTable.keySet().iterator();
+		while(iterTable.hasNext())
+		{
+			String nt = iterTable.next();
+			s += nt+": " + "{";
+			HashMap<String, Integer> row = parseTable.get(nt);
+			Iterator<String> iterRow = row.keySet().iterator();
+			while(iterRow.hasNext())
+			{
+				String t = iterRow.next();
+				s += t + ": ";
+				int value = row.get(t);
+				if(value == -1)
+				{
+					s += "--";
+				}
+				else
+				{
+					s += value;
+				}
+				s += ", ";
+			}
+			if (row.size() != 0)
+			{
+				s = s.substring(0, s.length()-2);
+			}
+			s += "}\n";
+		}
+
+		return s;
+	}
+
+	public String getProductions()
+	{
+		String s = "";
+
+		s += "Productions: \n";
+		for (int i=0; i<productions.size(); i++)
+		{
+			s += i + ": ";
+			Production p = productions.get(i);
+			s += p.getLeftHandSide().getValue()+" -> ";
+			int j;
+			for (j=0; j<p.getRightHandSideCount(); j++)
+			{
+				Symbol rhsj = p.getRightHandSide(j);
+				s += rhsj.getValue() + " ";
+			}
+			if( j!=0)
+			{
+				s = s.substring(0, s.length()-1);
+			}
+			s += "\n";
+		}
+		//s += "\n";	
+
+		return s;
+	}
+	
+	public String getFirstSets()
+	{
+		String s = "First Sets: \n";
+		Iterator<Symbol> iterFirstTable = firstTable.keySet().iterator();
+		while (iterFirstTable.hasNext())
+		{
+			Symbol A = iterFirstTable.next();
+			s += A.getValue() + ": " + "[";
+			HashSet<Symbol> set = firstTable.get(A);
+			Iterator<Symbol> iterSet = set.iterator();
+			while(iterSet.hasNext())
+			{
+				s += iterSet.next() + ", ";
+			}
+			if(set.size() != 0)
+			{
+				s = s.substring(0, s.length()-2);
+			}
+			s += "]\n";
+		}
+		return s;
+	}
+	
+	public String getFollowSets()
+	{
+		String s = "Follow Sets: \n";
+		Iterator<Symbol> iterFollowTable = followTable.keySet().iterator();
+		while (iterFollowTable.hasNext())
+		{
+			Symbol A = iterFollowTable.next();
+			s += A.getValue() + ": " + "[";
+			HashSet<Symbol> set = followTable.get(A);
+			Iterator<Symbol> iterSet = set.iterator();
+			while(iterSet.hasNext())
+			{
+				s += iterSet.next() + ", ";
+			}
+			if(set.size() != 0)
+			{
+				s = s.substring(0, s.length()-2);
+			}
+			s += "]\n";
+		}
+		return s;
+	}
+	
+	public String getFirstPlusSets()
+	{
+		String s = "First+ Sets: \n";
+		for (int i=0; i<productions.size(); i++)
+		{
+			Production p = productions.get(i);
+			s += p +": \n\t[";
+			HashSet<Symbol> set = firstPlusTable.get(p);
+			Iterator<Symbol> iterSet = set.iterator();
+			while(iterSet.hasNext())
+			{
+				s += iterSet.next() + " ";
+			}
+			if(set.size() != 0)
+			{
+				s = s.substring(0, s.length()-1);
+			}
+			s += "]\n";
+		}
+		return s;
 	}
 
 }

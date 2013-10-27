@@ -1,7 +1,7 @@
 
 public class Symbol {
 	
-	public static Symbol EOF = new Symbol(Symbol.Type.TERMINAL, "EOF");
+	public static Symbol EOF = new Symbol(Symbol.Type.TERMINAL, "<EOF>");
 	public static Symbol EPSILON = new Symbol(Symbol.Type.TERMINAL, "EPSILON");
 	
 	public enum Type { NONTERMINAL, TERMINAL };

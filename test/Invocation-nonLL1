@@ -10,7 +10,7 @@ Trailer : LP RP
 
 Factor : name ArgList
        | number
-       | ( Expr )
+       | LP Expr RP
        ;
 
 ArgList : LP ExprList RP
