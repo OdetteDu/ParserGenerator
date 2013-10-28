@@ -4,32 +4,41 @@ import java.io.FileReader;
 import java.util.ArrayList;
 
 public class ParserGenerator {
-	
+
 	private String inputGrammarPath;
 	BufferedReader bufferedFileReader;
 	Scanner scanner;
 	Parser parser;
 	TableGenerator generator;
-	
+
 	public ParserGenerator(String inputGrammarPath)
 	{
 		this.inputGrammarPath=inputGrammarPath;
 	}
-	
-	public void run() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException
+
+	public void run(boolean shouldRemoveLeftRecursion) throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException
 	{
 		bufferedFileReader = openFile(inputGrammarPath);
 		scanner = new Scanner();
 		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
 		parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
-		generator = new TableGenerator(parser.getStartSymbol(), productions, 
-				parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
-		generator.generate();
+		if(shouldRemoveLeftRecursion)
+		{
+			LeftRecursionRemover leftRecursionRemover = new LeftRecursionRemover(parser.getStartSymbol(), productions, 
+					parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
+			leftRecursionRemover.removeLeftRecursion();
+		}
+		else
+		{
+			generator = new TableGenerator(parser.getStartSymbol(), productions, 
+					parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
+			generator.generate();
+		}
 	}
-	
-	
-	
+
+
+
 	private BufferedReader openFile(String filePath) throws InvalidCommandLineArgumentException
 	{
 		try
@@ -43,27 +52,27 @@ public class ParserGenerator {
 			throw new InvalidCommandLineArgumentException("The filePath is invalid or the file can not be found.");
 		}
 	}
-	
+
 	public String getLLOneTable()
 	{
 		return generator.getLLOneTableInYAML();
 	}
-	
+
 	public String getProductions()
 	{
 		return generator.getProductions();	
 	}
-	
+
 	public String getFirstSets()
 	{
 		return generator.getFirstSets();
 	}
-	
+
 	public String getFollowSets()
 	{
 		return generator.getFollowSets();
 	}
-	
+
 	public String getFirstPlusSets()
 	{
 		return generator.getFirstPlusSets();
@@ -87,6 +96,7 @@ public class ParserGenerator {
 		}
 		else
 		{
+			boolean shouldRemoveLeftRecursion = false;
 			String filePath = "";
 			for (int i=0; i<args.length; i++)
 			{
@@ -103,16 +113,21 @@ public class ParserGenerator {
 								+ "The program can't determine which one is the file path. ");
 					}
 				}
+
+				if (argument.equals("-r"))
+				{
+					shouldRemoveLeftRecursion = true;
+				}
 			}
-			
+
 			if (filePath.isEmpty())
 			{
 				throw new InvalidCommandLineArgumentException("Did not provide any input file.");
 			}
-			
+
 			ParserGenerator parserGenerator = new ParserGenerator(filePath);
-			parserGenerator.run();
-			
+			parserGenerator.run(shouldRemoveLeftRecursion);
+
 			for( int i=0; i<args.length; i++)
 			{
 				if(args[i].equals("-t"))
@@ -154,7 +169,7 @@ public class ParserGenerator {
 							"-a Print everything in a human readable form\n"+
 							"-? Print a list of the valid command-line flags");
 				}
-						
+
 			}
 		}
 	}

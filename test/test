@@ -1,9 +1,17 @@
-BParens : List
-        ;
+Goal   : Expr
+       ;
 
-List : Pair List
-     | epsilon
-     ;
+Expr   : Expr PLUS  Term
+       | Expr MINUS Term
+       | Term
+       ;
 
-Pair : LParen List RParen
-     ;
+Term   : Term TIMES  Factor
+       | Term DIVIDE Factor
+       | Factor
+       ;
+
+Factor : LP Expr RP
+       | NUMBER
+       | IDENTIFIER
+       ;

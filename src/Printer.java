@@ -9,7 +9,7 @@ public class Printer<E> {
 	{
 		for (int i=0; i<toBePrinted.size(); i++)
 		{
-			System.out.println(toBePrinted.get(i));
+			System.out.println(i+": "+toBePrinted.get(i));
 		}
 		
 		System.out.println();
@@ -37,5 +37,14 @@ public class Printer<E> {
 	{
 		System.out.println(name);
 		print(toBePrinted);
+	}
+	
+	public static void print(Symbol [] toBePrinted)
+	{
+		for (int i=0; i<toBePrinted.length; i++)
+		{
+			System.out.println(i+": "+toBePrinted[i]);
+		}
+		System.out.println();
 	}
 }
