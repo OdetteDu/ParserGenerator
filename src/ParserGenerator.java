@@ -25,8 +25,7 @@ public class ParserGenerator {
 		ArrayList<Production> productions = parser.parse(productionSets);
 		if(shouldRemoveLeftRecursion)
 		{
-			LeftRecursionRemover leftRecursionRemover = new LeftRecursionRemover(parser.getStartSymbol(), productions, 
-					parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
+			LeftRecursionRemover leftRecursionRemover = new LeftRecursionRemover(productions, parser.getNonTerminalSymbols());
 			leftRecursionRemover.removeLeftRecursion();
 		}
 		else
