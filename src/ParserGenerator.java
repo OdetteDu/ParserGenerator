@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ParserGenerator {
 
@@ -23,17 +24,20 @@ public class ParserGenerator {
 		ArrayList<ProductionSet> productionSets=scanner.scan(bufferedFileReader);
 		parser = new Parser();
 		ArrayList<Production> productions = parser.parse(productionSets);
-		if(shouldRemoveLeftRecursion)
+		HashMap<String, Symbol> nonTerminalSymbols = parser.getNonTerminalSymbols();
+
+		if(shouldRemoveLeftRecursion && (!parser.getTerminalSymbols().containsKey(Symbol.EPSILON.getValue())))
 		{
 			LeftRecursionRemover leftRecursionRemover = new LeftRecursionRemover(productions, parser.getNonTerminalSymbols());
 			leftRecursionRemover.removeLeftRecursion();
+
+			productions = leftRecursionRemover.getProductions();
+			nonTerminalSymbols = leftRecursionRemover.getNonTerminalSymbols();
 		}
-		else
-		{
-			generator = new TableGenerator(parser.getStartSymbol(), productions, 
-					parser.getTerminalSymbols(), parser.getNonTerminalSymbols());
-			generator.generate();
-		}
+
+		generator = new TableGenerator(parser.getStartSymbol(), productions, 
+				parser.getTerminalSymbols(), nonTerminalSymbols);
+		generator.generate();
 	}
 
 

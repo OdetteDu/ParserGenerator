@@ -13,49 +13,49 @@ public class ParserGeneratorTest {
 	
 	@Test
 	public void testCEGLR() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/CEG-LR"};
+		String [] args = {"-r -a", "test/CEG-LR"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testCEGRR() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/CEG-RR"};
+		String [] args = {"-a -r", "test/CEG-RR"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testFactor() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/Factor-LL1-RR"};
+		String [] args = {"-a -r", "test/Factor-LL1-RR"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testInvocation() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/Invocation-nonLL1"};
+		String [] args = {"-a -r", "test/Invocation-nonLL1"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testParens() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/Parens"};
+		String [] args = {"-a -r", "test/Parens"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testParensAlt() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/Parens-Alt"};
+		String [] args = {"-a -r", "test/Parens-Alt"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testSNnonLL1RR() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/SN-nonLL1-RR"};
+		String [] args = {"-a -r", "test/SN-nonLL1-RR"};
 		ParserGenerator.main(args);
 	}
 	
 	@Test
 	public void testSNRRLL1() throws InvalidCommandLineArgumentException, IllegalCharacterException, ParseException, NotLLOneGrammarException {
-		String [] args = {"-a", "test/SN-RR-LL1"};
+		String [] args = {"-a -r", "test/SN-RR-LL1"};
 		ParserGenerator.main(args);
 	}
 

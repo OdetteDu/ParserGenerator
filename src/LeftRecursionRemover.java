@@ -69,6 +69,8 @@ public class LeftRecursionRemover {
 			productions.addAll(newProductions);
 		}
 		
+		//Printer.print(productions);
+		
 //		for (int i=0; i<NT.length; i++)
 //		{
 //			
@@ -196,6 +198,14 @@ public class LeftRecursionRemover {
 		}
 
 		return nonTerminals;
+	}
+
+	public ArrayList<Production> getProductions() {
+		return productions;
+	}
+
+	public HashMap<String, Symbol> getNonTerminalSymbols() {
+		return nonTerminalSymbols;
 	}
 
 }
